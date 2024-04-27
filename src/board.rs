@@ -1,15 +1,18 @@
-use crate::{board_size::BoardSize, number_set::NumberSet};
+use crate::{
+    board_size::BoardSize,
+    number_set::{self, NumberSet},
+};
 use colored::*;
 use itertools::Itertools;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Cell {
     StartingNumber(u8),
     SolvedNumber(u8),
     Unsolved(NumberSet),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Board {
     pub board_size: BoardSize,
     pub cells: Vec<Cell>,
@@ -50,7 +53,7 @@ impl Board {
                 match cell {
                     Cell::StartingNumber(number) => (format!(" {number:X} ")).cyan().bold(),
                     Cell::SolvedNumber(number) => (format!(" {number:X} ")).white(),
-                    Cell::Unsolved(_) => "   ".to_string().black(),
+                    Cell::Unsolved(_number_set) => "   ".to_string().black(),
                 }
                 .on_custom_color(if self.board_size.get_checkered_bool(index) {
                     CustomColor::new(64, 64, 64)

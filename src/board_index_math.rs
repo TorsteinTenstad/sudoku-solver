@@ -29,3 +29,27 @@ pub fn get_square_indexes(board_size: BoardSize, index: usize) -> Vec<usize> {
         })
         .collect()
 }
+
+pub fn get_all_row_indexes(board_size: BoardSize) -> Vec<Vec<usize>> {
+    (0..board_size.size())
+        .map(|index| get_row_indexes(board_size, index * board_size.size()))
+        .collect()
+}
+
+pub fn get_all_col_indexes(board_size: BoardSize) -> Vec<Vec<usize>> {
+    (0..board_size.size())
+        .map(|index| get_col_indexes(board_size, index))
+        .collect()
+}
+
+pub fn get_all_square_indexes(board_size: BoardSize) -> Vec<Vec<usize>> {
+    let v: Vec<usize> = match board_size {
+        BoardSize::_16x16 => vec![
+            0, 4, 8, 12, 64, 68, 72, 76, 128, 132, 136, 140, 192, 196, 200, 204,
+        ],
+        _ => todo!(),
+    };
+    v.iter()
+        .map(|index| get_square_indexes(board_size, *index))
+        .collect()
+}

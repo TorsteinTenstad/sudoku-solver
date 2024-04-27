@@ -1,8 +1,8 @@
 use std::ops::Range;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NumberSet {
-    numbers: Vec<u8>,
+    pub numbers: Vec<u8>,
 }
 
 impl NumberSet {

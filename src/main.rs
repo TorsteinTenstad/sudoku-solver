@@ -56,8 +56,9 @@ fn main() {
         );
         println!("{}", board.to_display_string());
 
-        board_transformations::reduce_unsolved_number_sets(&mut board);
+        board_transformations::reduce_from_solved(&mut board);
         board_transformations::promote_singles_to_solved(&mut board);
+        board_transformations::solve_only_spot(&mut board);
         i += 1;
 
         let new_number_of_solved_squares = board.number_of_solved_squares();
