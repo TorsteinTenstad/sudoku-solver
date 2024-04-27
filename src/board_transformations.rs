@@ -2,7 +2,7 @@ use crate::board::{Board, Cell};
 use crate::board_index_math::{get_col_indexes, get_row_indexes, get_square_indexes};
 
 pub fn promote_singles_to_solved(board: &mut Board) {
-    for (_index, cell) in board.cells.iter_mut().enumerate() {
+    for cell in board.cells.iter_mut() {
         if let Cell::Unsolved(number_set) = cell {
             if let Some(number) = number_set.single() {
                 *cell = Cell::SolvedNumber(number);

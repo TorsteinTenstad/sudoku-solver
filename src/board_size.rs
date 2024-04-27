@@ -31,10 +31,15 @@ impl BoardSize {
     }
     pub fn get_checkered_bool(&self, index: usize) -> bool {
         let short_square_period = index % (2 * self.square_size()) / self.square_size() == 0;
-        let row_period = index % (2 * self.size()) / self.size() == 0;
+
+        let row_period = match &self {
+            BoardSize::_4x4 => false,
+            BoardSize::_9x9 => index % (2 * self.size()) / self.size() == 0,
+            BoardSize::_16x16 => false,
+        };
         let long_square_period = index % (2 * self.cell_count_in_row_of_square())
             / self.cell_count_in_row_of_square()
             == 0;
-        (short_square_period != row_period) != long_square_period
+        (short_square_period != long_square_period) != row_period
     }
 }
