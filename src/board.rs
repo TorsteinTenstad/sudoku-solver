@@ -1,0 +1,78 @@
+use crate::{board_size::BoardSize, number_set::NumberSet};
+use colored::*;
+use itertools::Itertools;
+
+#[derive(Debug)]
+pub enum Cell {
+    StartingNumber(u8),
+    SolvedNumber(u8),
+    Unsolved(NumberSet),
+}
+
+#[derive(Debug)]
+pub struct Board {
+    pub board_size: BoardSize,
+    pub cells: Vec<Cell>,
+}
+
+impl Board {
+    pub fn new(board_size: BoardSize) -> Board {
+        Self {
+            cells: (0..board_size.cell_count())
+                .map(|_| Cell::Unsolved(NumberSet::new(board_size.number_set())))
+                .collect(),
+            board_size,
+        }
+    }
+    pub fn from_board_str(board_size: BoardSize, board_str: &str) -> Self {
+        Self {
+            cells: board_str
+                .split_whitespace()
+                .map(|c| match c {
+                    "_" => Cell::Unsolved(NumberSet::new(board_size.number_set())),
+                    _ => Cell::StartingNumber(c.parse().unwrap()),
+                })
+                .collect(),
+            board_size,
+        }
+    }
+    pub fn to_display_string(&self) -> String {
+        self.cells
+            .iter()
+            .enumerate()
+            .map(|(index, cell)| {
+                match cell {
+                    Cell::StartingNumber(number) => (format!(" {} ", number)).cyan().bold(),
+                    Cell::SolvedNumber(number) => (format!(" {} ", number)).white(),
+                    Cell::Unsolved(_) => "   ".to_string().black(),
+                }
+                .on_custom_color(if self.board_size.get_checkered_bool(index) {
+                    CustomColor::new(64, 64, 64)
+                } else {
+                    CustomColor::new(32, 32, 32)
+                })
+            })
+            .chunks(self.board_size.size())
+            .into_iter()
+            .map(|chunk| chunk.into_iter().join(""))
+            .join("\n")
+    }
+    pub fn number_of_solved_squares(&self) -> usize {
+        self.cells
+            .iter()
+            .filter(|cell| matches!(cell, Cell::SolvedNumber(_) | Cell::StartingNumber(_)))
+            .count()
+    }
+    pub fn unsolved_metric(&self) -> usize {
+        self.cells
+            .iter()
+            .filter_map(|cell| match cell {
+                Cell::Unsolved(number_set) => Some(number_set.len()),
+                _ => None,
+            })
+            .sum()
+    }
+    pub fn is_solved(&self) -> bool {
+        self.number_of_solved_squares() == self.board_size.cell_count()
+    }
+}
