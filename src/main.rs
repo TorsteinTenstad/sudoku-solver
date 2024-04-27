@@ -9,6 +9,7 @@ use board_size::BoardSize;
 
 fn main() {
     /*
+    // Simple example
     let mut board = Board::from_board_str(
         BoardSize::_9x9,
         "
@@ -24,6 +25,9 @@ fn main() {
         ",
     );
     */
+
+    /*
+    // Mestersudoku 5 stars
     let mut board = Board::from_board_str(
         BoardSize::_16x16,
         "
@@ -43,6 +47,29 @@ fn main() {
         E _ D F _ _ 6 _ _ _ _ 9 0 _ _ B
         _ _ _ _ _ _ _ 9 _ _ _ _ _ _ _ _
         1 _ _ _ _ _ _ _ _ 7 E 0 8 4 _ 2
+        ",
+    );
+    */
+    // Mestersudoku 4 stars
+    let mut board = Board::from_board_str(
+        BoardSize::_16x16,
+        "
+        _ B 6 F 2 _ 0 _ _ _ 4 _ 1 _ _ _
+        _ _ _ 0 _ _ B 9 _ E _ C _ _ _ _
+        _ 5 _ _ _ A _ _ 1 _ _ 0 4 _ _ C
+        _ _ _ _ _ _ 5 _ _ _ _ _ D 3 A _
+        _ _ _ _ 3 _ _ _ _ _ _ _ A 0 C _
+        _ 4 8 D _ _ 1 _ _ _ C _ _ _ _ _
+        _ _ 9 _ _ 8 _ 0 _ A _ _ 2 _ _ 3
+        _ 3 _ _ D 2 7 C _ _ _ _ 9 _ 4 _
+        _ _ _ _ 1 _ _ _ _ _ 9 _ _ 4 _ D
+        _ A C _ _ 4 _ _ D 0 E _ _ _ _ _
+        0 _ _ _ _ _ 3 _ _ 2 _ _ 6 8 9 _
+        9 _ _ _ 5 C _ _ F _ _ 8 _ _ _ _
+        _ 8 A _ 0 _ _ _ 5 _ _ 6 _ _ _ _
+        4 _ _ E _ _ _ A 9 F _ _ _ 2 3 _
+        5 9 _ _ _ 7 4 1 _ _ _ _ _ B _ _
+        2 D _ _ 6 _ _ _ B _ _ 4 _ E _ _
         ",
     );
 

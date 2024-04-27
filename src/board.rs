@@ -53,7 +53,8 @@ impl Board {
                 match cell {
                     Cell::StartingNumber(number) => (format!(" {number:X} ")).cyan().bold(),
                     Cell::SolvedNumber(number) => (format!(" {number:X} ")).white(),
-                    Cell::Unsolved(_number_set) => "   ".to_string().black(),
+                    //Cell::Unsolved(set) => {format!(" {} ", set.len()).to_string().red()}
+                    Cell::Unsolved(_) => "   ".red(),
                 }
                 .on_custom_color(if self.board_size.get_checkered_bool(index) {
                     CustomColor::new(64, 64, 64)
