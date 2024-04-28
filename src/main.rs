@@ -1,11 +1,13 @@
 mod board;
 mod board_index_math;
+mod board_is_valid;
 mod board_size;
 mod board_transformations;
 mod number_set;
-
+mod solver;
 use board::Board;
 use board_size::BoardSize;
+use solver::{solve, SolveExitCondition};
 
 fn main() {
     /*
@@ -26,9 +28,8 @@ fn main() {
     );
     */
 
-    /*
     // Mestersudoku 5 stars
-    let mut board = Board::from_board_str(
+    let mut board_5_star = Board::from_board_str(
         BoardSize::_16x16,
         "
         F _ _ 0 _ 7 _ _ 4 _ _ _ 1 D _ E
@@ -49,9 +50,9 @@ fn main() {
         1 _ _ _ _ _ _ _ _ 7 E 0 8 4 _ 2
         ",
     );
-    */
+
     // Mestersudoku 4 stars
-    let mut board = Board::from_board_str(
+    let mut board_4_star = Board::from_board_str(
         BoardSize::_16x16,
         "
         _ B 6 F 2 _ 0 _ _ _ 4 _ 1 _ _ _
@@ -73,41 +74,20 @@ fn main() {
         ",
     );
 
-    let mut number_of_solved_squares = board.number_of_solved_squares();
-    let mut unsolved_metric = board.unsolved_metric();
-    let mut i = 0;
-    let solved = loop {
-        println!(
-            "Solved: {}, unsolved metric {}",
-            number_of_solved_squares, unsolved_metric
-        );
-        println!("{}", board.to_display_string());
+    let board = board_5_star;
 
-        board_transformations::reduce_from_solved(&mut board);
-        board_transformations::promote_singles_to_solved(&mut board);
-        board_transformations::solve_only_spot(&mut board);
-        i += 1;
-
-        let new_number_of_solved_squares = board.number_of_solved_squares();
-        let new_unsolved_metric = board.unsolved_metric();
-        if number_of_solved_squares == new_number_of_solved_squares
-            && unsolved_metric == new_unsolved_metric
-        {
-            break false;
+    let solve_result = solve(board);
+    match solve_result.exit_condition {
+        SolveExitCondition::Solved(board) => {
+            println!("Solved!");
+            println!("{}", board.to_display_string());
         }
-        number_of_solved_squares = new_number_of_solved_squares;
-        unsolved_metric = new_unsolved_metric;
-        if board.is_solved() {
-            break true;
+        SolveExitCondition::NoChange(board) => {
+            println!("No change!");
+            println!("{}", board.to_display_string());
         }
-    };
-    match solved {
-        true => println!("Solved after {} iterations", i),
-        false => println!("Failed to progress after {} iterations", i),
+        SolveExitCondition::InvalidBoard => {
+            println!("Invalid board!");
+        }
     }
-    println!(
-        "Solved: {}, unsolved metric {}",
-        number_of_solved_squares, unsolved_metric
-    );
-    println!("{}", board.to_display_string());
 }
