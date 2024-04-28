@@ -1,5 +1,5 @@
 use crate::{
-    board::{Board, Cell},
+    board::{Board, Cell, SolvedNumber},
     board_is_valid::board_is_valid,
     board_transformations::{promote_singles_to_solved, reduce_from_solved, solve_only_spot},
     number_set::NumberSet,
@@ -58,17 +58,37 @@ struct Guess {
     set: NumberSet,
     number: u8,
 }
-
 fn get_best_guess(board: &Board) -> Option<Guess> {
+    let best_option_count = (2..board.board_size.size())
+        .find(|option_count| {
+            for cell in board.cells.iter() {
+                if let Cell::Unsolved(set) = cell {
+                    if set.len() == *option_count {
+                        return true;
+                    }
+                }
+            }
+            false
+        })
+        .unwrap();
     board
         .cells
         .iter()
         .enumerate()
         .filter_map(|(index, cell)| match cell {
-            Cell::Unsolved(set) if set.len() >= 2 => Some((index, set.clone())),
+            Cell::Unsolved(set) if set.len() == best_option_count => Some((index, set.clone())),
             _ => None,
         })
-        .min_by_key(|(_idx, set)| set.len())
+        .min_by_key(|(index, set)| {
+            set.numbers
+                .iter()
+                .map(|number| {
+                    let mut board = board.clone();
+                    board.cells[*index] = Cell::Solved(SolvedNumber::new(*number));
+                    try_solve(board).unsolved_metric
+                })
+                .sum::<usize>()
+        })
         .map(|(index, set)| Guess {
             index,
             number: set.numbers[0],
@@ -91,7 +111,7 @@ pub fn solve(board: Board) -> SolveResult {
                 };
             };
             let mut guess_board = board.clone();
-            guess_board.cells[guess.index] = Cell::StartingNumber(guess.number);
+            guess_board.cells[guess.index] = Cell::Solved(SolvedNumber::new(guess.number));
             let solve_result = solve(guess_board);
             match solve_result.exit_condition {
                 SolveExitCondition::Solved(_) => solve_result,
@@ -99,7 +119,7 @@ pub fn solve(board: Board) -> SolveResult {
                     let mut reduced_guess_set = guess.set.clone();
                     reduced_guess_set.numbers.remove(0);
                     if Some(guess.number) == reduced_guess_set.single() {
-                        board.cells[guess.index] = Cell::SolvedNumber(guess.number);
+                        board.cells[guess.index] = Cell::Solved(SolvedNumber::new(guess.number));
                     } else {
                         board.cells[guess.index] = Cell::Unsolved(reduced_guess_set);
                     }

@@ -3,9 +3,32 @@ use colored::*;
 use itertools::Itertools;
 
 #[derive(Debug, Clone)]
+pub struct SolvedNumber {
+    pub number: u8,
+    pub checked: bool,
+    pub is_starting: bool,
+}
+
+impl SolvedNumber {
+    pub fn new_starting(number: u8) -> Self {
+        Self {
+            number,
+            checked: false,
+            is_starting: true,
+        }
+    }
+    pub fn new(number: u8) -> Self {
+        Self {
+            number,
+            checked: false,
+            is_starting: false,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub enum Cell {
-    StartingNumber(u8),
-    SolvedNumber(u8),
+    Solved(SolvedNumber),
     Unsolved(NumberSet),
 }
 
@@ -23,13 +46,13 @@ impl Board {
                 .split_whitespace()
                 .map(|c| match c {
                     "_" => Cell::Unsolved(NumberSet::new(board_size.number_set())),
-                    "A" => Cell::StartingNumber(10),
-                    "B" => Cell::StartingNumber(11),
-                    "C" => Cell::StartingNumber(12),
-                    "D" => Cell::StartingNumber(13),
-                    "E" => Cell::StartingNumber(14),
-                    "F" => Cell::StartingNumber(15),
-                    _ => Cell::StartingNumber(c.parse().unwrap()),
+                    "A" => Cell::Solved(SolvedNumber::new_starting(10)),
+                    "B" => Cell::Solved(SolvedNumber::new_starting(11)),
+                    "C" => Cell::Solved(SolvedNumber::new_starting(12)),
+                    "D" => Cell::Solved(SolvedNumber::new_starting(13)),
+                    "E" => Cell::Solved(SolvedNumber::new_starting(14)),
+                    "F" => Cell::Solved(SolvedNumber::new_starting(15)),
+                    _ => Cell::Solved(SolvedNumber::new_starting(c.parse().unwrap())),
                 })
                 .collect(),
             board_size,
@@ -41,8 +64,13 @@ impl Board {
             .enumerate()
             .map(|(index, cell)| {
                 match cell {
-                    Cell::StartingNumber(number) => (format!(" {number:X} ")).cyan().bold(),
-                    Cell::SolvedNumber(number) => (format!(" {number:X} ")).white(),
+                    Cell::Solved(solved) => {
+                        (format!(" {:X} ", solved.number)).color(if solved.is_starting {
+                            Color::Cyan
+                        } else {
+                            Color::White
+                        })
+                    }
                     //Cell::Unsolved(set) => {format!(" {} ", set.len()).to_string().red()}
                     Cell::Unsolved(_) => "   ".red(),
                 }
@@ -60,7 +88,7 @@ impl Board {
     pub fn number_of_solved_squares(&self) -> usize {
         self.cells
             .iter()
-            .filter(|cell| matches!(cell, Cell::SolvedNumber(_) | Cell::StartingNumber(_)))
+            .filter(|cell| matches!(cell, Cell::Solved(_)))
             .count()
     }
     pub fn unsolved_metric(&self) -> usize {

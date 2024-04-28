@@ -1,4 +1,4 @@
-use crate::board::{Board, Cell};
+use crate::board::{Board, Cell, SolvedNumber};
 use crate::board_index_math::{
     get_all_col_indexes, get_all_row_indexes, get_all_square_indexes, get_col_indexes,
     get_row_indexes, get_square_indexes,
@@ -8,20 +8,22 @@ pub fn promote_singles_to_solved(board: &mut Board) {
     for cell in board.cells.iter_mut() {
         if let Cell::Unsolved(number_set) = cell {
             if let Some(number) = number_set.single() {
-                *cell = Cell::SolvedNumber(number);
+                *cell = Cell::Solved(SolvedNumber::new(number));
             }
         }
     }
 }
 
-pub fn get_solved(board: &Board) -> Vec<(usize, u8)> {
+pub fn get_unchecked_solved_set_checked(board: &mut Board) -> Vec<(usize, u8)> {
     board
         .cells
-        .iter()
+        .iter_mut()
         .enumerate()
         .filter_map(|(index, cell)| match cell {
-            Cell::SolvedNumber(number) => Some((index, *number)),
-            Cell::StartingNumber(number) => Some((index, *number)),
+            Cell::Solved(solved) if !solved.checked => {
+                solved.checked = true;
+                Some((index, solved.number))
+            }
             _ => None,
         })
         .collect()
@@ -41,14 +43,8 @@ pub fn solve_only_spot_for_number_in_group(board: &mut Board, number: u8, group:
                     }
                 }
             }
-            Cell::SolvedNumber(solved_number) => {
-                if *solved_number == number {
-                    only_possible_cell_index = None;
-                    break;
-                }
-            }
-            Cell::StartingNumber(starting_number) => {
-                if *starting_number == number {
+            Cell::Solved(solved_number) => {
+                if solved_number.number == number {
                     only_possible_cell_index = None;
                     break;
                 }
@@ -56,7 +52,7 @@ pub fn solve_only_spot_for_number_in_group(board: &mut Board, number: u8, group:
         }
     }
     if let Some(index) = only_possible_cell_index {
-        board.cells[index] = Cell::SolvedNumber(number);
+        board.cells[index] = Cell::Solved(SolvedNumber::new(number));
     }
 }
 
@@ -92,7 +88,7 @@ pub fn reduce_from_solved_group<F>(
 
 pub fn reduce_from_solved(board: &mut Board) {
     let board_size = board.board_size;
-    let solved = get_solved(board);
+    let solved = get_unchecked_solved_set_checked(board);
     for (index, number) in solved {
         reduce_from_solved_group(board, index, number, |i| get_row_indexes(board_size, i));
         reduce_from_solved_group(board, index, number, |i| get_col_indexes(board_size, i));

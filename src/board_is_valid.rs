@@ -16,11 +16,11 @@ pub fn groups_are_valid(board: &Board, groups: Vec<Vec<usize>>) -> bool {
     for group in groups.iter() {
         let mut unique_numbers = Vec::<u8>::new();
         for i in group {
-            if let Cell::SolvedNumber(solved_number) = &board.cells[*i] {
-                if unique_numbers.contains(solved_number) {
+            if let Cell::Solved(solved_number) = &board.cells[*i] {
+                if unique_numbers.contains(&solved_number.number) {
                     return false;
                 }
-                unique_numbers.push(*solved_number);
+                unique_numbers.push(solved_number.number);
             }
         }
     }
