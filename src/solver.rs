@@ -80,18 +80,17 @@ fn get_best_guess(board: &Board) -> Option<Guess> {
             _ => None,
         })
         .min_by_key(|(index, set)| {
-            set.numbers
-                .iter()
+            set.into_iter()
                 .map(|number| {
                     let mut board = board.clone();
-                    board.cells[*index] = Cell::Solved(SolvedNumber::new(*number));
+                    board.cells[*index] = Cell::Solved(SolvedNumber::new(number));
                     try_solve(board).unsolved_metric
                 })
                 .sum::<usize>()
         })
         .map(|(index, set)| Guess {
             index,
-            number: set.numbers[0],
+            number: set.first().unwrap(),
             set,
         })
 }
@@ -116,8 +115,7 @@ pub fn solve(board: Board) -> SolveResult {
             match solve_result.exit_condition {
                 SolveExitCondition::Solved(_) => solve_result,
                 SolveExitCondition::InvalidBoard => {
-                    let mut reduced_guess_set = guess.set.clone();
-                    reduced_guess_set.numbers.remove(0);
+                    let reduced_guess_set = guess.set.without(guess.number);
                     if Some(guess.number) == reduced_guess_set.single() {
                         board.cells[guess.index] = Cell::Solved(SolvedNumber::new(guess.number));
                     } else {
