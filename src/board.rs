@@ -1,7 +1,4 @@
-use crate::{
-    board_size::BoardSize,
-    number_set::{self, NumberSet},
-};
+use crate::{board_size::BoardSize, number_set::NumberSet};
 use colored::*;
 use itertools::Itertools;
 
@@ -19,16 +16,9 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new(board_size: BoardSize) -> Board {
-        Self {
-            cells: (0..board_size.cell_count())
-                .map(|_| Cell::Unsolved(NumberSet::new(board_size.number_set())))
-                .collect(),
-            board_size,
-        }
-    }
-    pub fn from_board_str(board_size: BoardSize, board_str: &str) -> Self {
-        Self {
+    pub fn from_board_str(board_str: &str) -> Option<Self> {
+        let board_size = BoardSize::from_cell_count(board_str.split_whitespace().count())?;
+        Some(Self {
             cells: board_str
                 .split_whitespace()
                 .map(|c| match c {
@@ -43,7 +33,7 @@ impl Board {
                 })
                 .collect(),
             board_size,
-        }
+        })
     }
     pub fn to_display_string(&self) -> String {
         self.cells

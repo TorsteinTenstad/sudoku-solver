@@ -1,11 +1,7 @@
-use core::num;
-use std::ops::Index;
-
 use crate::{
     board::{Board, Cell},
     board_is_valid::board_is_valid,
     board_transformations::{promote_singles_to_solved, reduce_from_solved, solve_only_spot},
-    number_set::NumberSet,
 };
 
 pub enum SolveExitCondition {

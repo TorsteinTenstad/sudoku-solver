@@ -1,4 +1,7 @@
-#[derive(Debug, Copy, Clone)]
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
+
+#[derive(Debug, Copy, Clone, EnumIter)]
 pub enum BoardSize {
     _4x4,
     _9x9,
@@ -6,6 +9,15 @@ pub enum BoardSize {
 }
 
 impl BoardSize {
+    pub fn iter() -> impl Iterator<Item = BoardSize> {
+        <BoardSize as IntoEnumIterator>::iter()
+    }
+}
+
+impl BoardSize {
+    pub fn from_cell_count(cell_count: usize) -> Option<Self> {
+        Self::iter().find(|&board_size| board_size.cell_count() == cell_count)
+    }
     pub fn square_size(&self) -> usize {
         match self {
             BoardSize::_4x4 => 2,

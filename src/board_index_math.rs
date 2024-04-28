@@ -1,4 +1,4 @@
-use crate::{board, board_size::BoardSize};
+use crate::board_size::BoardSize;
 
 pub fn get_row_indexes(board_size: BoardSize, index: usize) -> Vec<usize> {
     let row = index / board_size.size();

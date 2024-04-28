@@ -18,10 +18,6 @@ impl NumberSet {
         }
     }
 
-    pub fn add(&mut self, number: u8) {
-        self.numbers.push(number);
-    }
-
     pub fn contains(&self, number: u8) -> bool {
         self.numbers.contains(&number)
     }
