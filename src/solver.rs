@@ -2,6 +2,7 @@ use crate::{
     board::{Board, Cell},
     board_is_valid::board_is_valid,
     board_transformations::{promote_singles_to_solved, reduce_from_solved, solve_only_spot},
+    number_set::NumberSet,
 };
 
 pub enum SolveExitCondition {
@@ -52,23 +53,36 @@ pub fn try_solve(board: Board) -> SolveResult {
     }
 }
 
+struct Guess {
+    index: usize,
+    set: NumberSet,
+    number: u8,
+}
+
+fn get_best_guess(board: &Board) -> Option<Guess> {
+    board
+        .cells
+        .iter()
+        .enumerate()
+        .filter_map(|(index, cell)| match cell {
+            Cell::Unsolved(set) if set.len() >= 2 => Some((index, set.clone())),
+            _ => None,
+        })
+        .min_by_key(|(_idx, set)| set.len())
+        .map(|(index, set)| Guess {
+            index,
+            number: set.numbers[0],
+            set,
+        })
+}
+
 pub fn solve(board: Board) -> SolveResult {
     let solve_result = try_solve(board);
     match solve_result.exit_condition {
         SolveExitCondition::Solved(_) => solve_result,
         SolveExitCondition::InvalidBoard => solve_result,
         SolveExitCondition::NoChange(mut board) => {
-            let guess = board
-                .cells
-                .iter_mut()
-                .enumerate()
-                .filter_map(|(idx, cell)| match cell {
-                    Cell::Unsolved(set) => Some((idx, set.clone())),
-                    _ => None,
-                })
-                .min_by_key(|(_idx, set)| set.len())
-                .unwrap();
-            let Some(guess_number) = guess.1.numbers.first() else {
+            let Some(guess) = get_best_guess(&board) else {
                 return SolveResult {
                     exit_condition: SolveExitCondition::InvalidBoard,
                     number_of_solved_squares: 0,
@@ -77,18 +91,17 @@ pub fn solve(board: Board) -> SolveResult {
                 };
             };
             let mut guess_board = board.clone();
-            guess_board.cells[guess.0] = Cell::StartingNumber(*guess_number);
+            guess_board.cells[guess.index] = Cell::StartingNumber(guess.number);
             let solve_result = solve(guess_board);
             match solve_result.exit_condition {
                 SolveExitCondition::Solved(_) => solve_result,
                 SolveExitCondition::InvalidBoard => {
-                    if guess.1.len() == 2 {
-                        let only_option = guess.1.numbers[1];
-                        board.cells[guess.0] = Cell::SolvedNumber(only_option);
+                    let mut reduced_guess_set = guess.set.clone();
+                    reduced_guess_set.numbers.remove(0);
+                    if Some(guess.number) == reduced_guess_set.single() {
+                        board.cells[guess.index] = Cell::SolvedNumber(guess.number);
                     } else {
-                        let mut reduced_guess_set = guess.1.clone();
-                        reduced_guess_set.numbers.remove(0);
-                        board.cells[guess.0] = Cell::Unsolved(reduced_guess_set);
+                        board.cells[guess.index] = Cell::Unsolved(reduced_guess_set);
                     }
                     solve(board)
                 }

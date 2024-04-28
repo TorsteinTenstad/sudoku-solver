@@ -9,6 +9,7 @@ use anyhow::Context;
 use board::Board;
 use clap::Parser;
 use solver::{solve, SolveExitCondition};
+use std::time::Instant;
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
@@ -23,10 +24,14 @@ fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     let board_string = std::fs::read_to_string(args.board_file).context("reading board file")?;
     let board = Board::from_board_str(&board_string).context("parsing board")?;
+
+    let now = Instant::now();
     let solve_result = solve(board);
+    let elapsed = now.elapsed();
+
     match solve_result.exit_condition {
         SolveExitCondition::Solved(board) => {
-            println!("Solved!");
+            println!("Solved in {:?}", elapsed);
             println!("{}", board.to_display_string());
         }
         SolveExitCondition::NoChange(board) => {
