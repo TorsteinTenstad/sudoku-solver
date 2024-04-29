@@ -80,7 +80,8 @@ fn get_best_guess(board: &Board) -> Option<Guess> {
             _ => None,
         })
         .min_by_key(|(index, set)| {
-            set.into_iter()
+            set.clone()
+                .into_iter()
                 .map(|number| {
                     let mut board = board.clone();
                     board.cells[*index] = Cell::Solved(SolvedNumber::new(number));

@@ -46,7 +46,7 @@ impl NumberSet {
         }
     }
 
-    pub fn into_iter(&self) -> std::vec::IntoIter<u8> {
-        self.numbers.clone().into_iter()
+    pub fn into_iter(self) -> std::vec::IntoIter<u8> {
+        self.numbers.into_iter()
     }
 }
