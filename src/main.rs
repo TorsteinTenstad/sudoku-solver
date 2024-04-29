@@ -4,6 +4,7 @@ mod board_is_valid;
 mod board_size;
 mod board_transformations;
 mod number_set;
+mod number_set_tests;
 mod solver;
 use anyhow::Context;
 use board::Board;
