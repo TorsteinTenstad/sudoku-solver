@@ -1,11 +1,19 @@
+use crate::board_size::BoardSize;
+
 #[derive(Debug, Clone)]
 pub struct NumberSet {
     bitset: u16,
 }
 
 impl NumberSet {
-    pub fn new() -> Self {
-        Self { bitset: u16::MAX }
+    pub fn new(board_size: BoardSize) -> Self {
+        Self {
+            bitset: match board_size {
+                BoardSize::_4x4 => 0b0000000000011110,
+                BoardSize::_9x9 => 0b0000001111111110,
+                BoardSize::_16x16 => 0b1111111111111111,
+            },
+        }
     }
 
     pub fn remove(&mut self, number: u8) {

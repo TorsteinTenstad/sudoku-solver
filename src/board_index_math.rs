@@ -47,6 +47,7 @@ pub fn get_all_square_indexes(board_size: BoardSize) -> Vec<Vec<usize>> {
         BoardSize::_16x16 => vec![
             0, 4, 8, 12, 64, 68, 72, 76, 128, 132, 136, 140, 192, 196, 200, 204,
         ],
+        BoardSize::_9x9 => vec![0, 3, 6, 27, 30, 33, 54, 57, 60],
         _ => todo!(),
     };
     v.iter()

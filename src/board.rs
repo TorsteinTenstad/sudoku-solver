@@ -45,7 +45,7 @@ impl Board {
             cells: board_str
                 .split_whitespace()
                 .map(|c| match c {
-                    "_" => Cell::Unsolved(NumberSet::new()),
+                    "_" => Cell::Unsolved(NumberSet::new(board_size)),
                     "A" => Cell::Solved(SolvedNumber::new_starting(10)),
                     "B" => Cell::Solved(SolvedNumber::new_starting(11)),
                     "C" => Cell::Solved(SolvedNumber::new_starting(12)),

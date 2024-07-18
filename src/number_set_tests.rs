@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use crate::number_set::NumberSet;
+    use crate::{board_size::BoardSize, number_set::NumberSet};
 
     #[test]
     fn test_new() {
-        let number_set = NumberSet::new();
+        let number_set = NumberSet::new(BoardSize::_16x16);
         assert_eq!(number_set.len(), 16);
         for i in 0..16 {
             assert!(number_set.contains(i));
@@ -13,7 +13,7 @@ mod tests {
 
     #[test]
     fn test_remove() {
-        let mut number_set = NumberSet::new();
+        let mut number_set = NumberSet::new(BoardSize::_16x16);
         number_set.remove(3);
         assert_eq!(number_set.len(), 15);
         assert!(!number_set.contains(3));
@@ -21,20 +21,20 @@ mod tests {
 
     #[test]
     fn test_contains() {
-        let number_set = NumberSet::new();
+        let number_set = NumberSet::new(BoardSize::_16x16);
         assert!(number_set.contains(0));
         assert!(!number_set.contains(16));
     }
 
     #[test]
     fn test_single_is_none_too_many() {
-        let number_set = NumberSet::new();
+        let number_set = NumberSet::new(BoardSize::_16x16);
         assert_eq!(number_set.single(), None);
     }
 
     #[test]
     fn test_single_is_none() {
-        let mut number_set = NumberSet::new();
+        let mut number_set = NumberSet::new(BoardSize::_16x16);
         for i in 0..16 {
             number_set.remove(i);
         }
@@ -44,7 +44,7 @@ mod tests {
 
     #[test]
     fn test_single_is_some() {
-        let mut number_set = NumberSet::new();
+        let mut number_set = NumberSet::new(BoardSize::_16x16);
         for i in 1..16 {
             number_set.remove(i);
         }
@@ -54,13 +54,13 @@ mod tests {
 
     #[test]
     fn test_first() {
-        let number_set = NumberSet::new();
+        let number_set = NumberSet::new(BoardSize::_16x16);
         assert_eq!(number_set.first(), Some(0));
     }
 
     #[test]
     fn test_without() {
-        let number_set = NumberSet::new();
+        let number_set = NumberSet::new(BoardSize::_16x16);
         let number_set = number_set.without(3);
         assert_eq!(number_set.len(), 15);
         assert!(!number_set.contains(3));
@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn test_into_iter() {
-        let mut number_set = NumberSet::new();
+        let mut number_set = NumberSet::new(BoardSize::_16x16);
         number_set.remove(3);
         number_set.remove(5);
         number_set.remove(7);

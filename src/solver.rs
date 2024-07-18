@@ -59,24 +59,24 @@ struct Guess {
     number: u8,
 }
 fn get_best_guess(board: &Board) -> Option<Guess> {
-    let best_option_count = (2..board.board_size.size())
-        .find(|option_count| {
-            for cell in board.cells.iter() {
-                if let Cell::Unsolved(set) = cell {
-                    if set.len() == *option_count {
-                        return true;
-                    }
+    let best_option_count = (2..board.board_size.size()).find(|option_count| {
+        for cell in board.cells.iter() {
+            if let Cell::Unsolved(set) = cell {
+                if set.len() == *option_count {
+                    return true;
                 }
             }
-            false
-        })
-        .unwrap();
+        }
+        false
+    });
     board
         .cells
         .iter()
         .enumerate()
         .filter_map(|(index, cell)| match cell {
-            Cell::Unsolved(set) if set.len() == best_option_count => Some((index, set.clone())),
+            Cell::Unsolved(set) if best_option_count.map(|x| x == set.len()).unwrap_or(true) => {
+                Some((index, set.clone()))
+            }
             _ => None,
         })
         .min_by_key(|(index, set)| {
