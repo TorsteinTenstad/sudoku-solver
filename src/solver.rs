@@ -102,6 +102,9 @@ pub fn solve(board: Board) -> SolveResult {
         SolveExitCondition::Solved(_) => solve_result,
         SolveExitCondition::InvalidBoard => solve_result,
         SolveExitCondition::NoChange(mut board) => {
+            println!("Guess necessary");
+            println!("{}", board.to_display_string());
+            panic!();
             let Some(guess) = get_best_guess(&board) else {
                 return SolveResult {
                     exit_condition: SolveExitCondition::InvalidBoard,
